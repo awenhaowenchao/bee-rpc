@@ -1,0 +1,63 @@
+#web框架可以集成flask或其他
+server:
+  port: 8080
+  context-path: /bee
+
+debug: true
+banner: true
+
+bee:
+  application:
+    name: "bee-rpc-app"
+  rpc:
+    registry:
+      #direct\etcd3\zk .etc
+      protocol: "etcd3"
+      address: 127.0.0.1:2379
+      #心跳频率，单位s
+      heartbeat_interval: 30
+    server:
+      name: "test"
+      desc: "test service"
+      version: 2.0
+      register: True
+      macher: json
+      address:
+        url: "127.0.0.1:9000"
+#        - url: :9000
+#        - url: tls://:9001
+#        options:
+#          #          register: true
+#          tls_key: "test.key"
+#          tls_cert: "test.cert"
+#          - url: unix:///var/startup/test.sock
+      max_conn_size: 1000
+      max_pool_size: 1024
+      backlog: 1024
+      read_timeout: 10
+      write_timeout: 10
+
+    client:
+      test:
+        version: ">=1.0, <2"
+        address:
+          url: "127.0.0.1:9000"
+#          - url: "localhost:9000"
+#          - url: "tls://localhost:9001"
+#            options:
+#              tls_key: "test.key"
+#              tls_cert: "test.cert"
+        # 容错机制failover、failfast、failtry
+        fail: failfast
+        codec:
+          name: json
+          options:
+            max_size: 2 m
+        #random\round-robin
+        balancer: random
+        #connect超时时间，单位秒
+        connect_timeout: 5
+        #读超时时间，单位秒
+        read_timeout: 10
+        #写超时时间，单位秒
+        write_timeout: 10

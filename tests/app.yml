@@ -1,0 +1,162 @@
+server:
+  port: 8080
+  context-path: /bee
+
+debug: true
+banner: true
+
+bee:
+  application:
+  name: "bee-rpc-app"
+  rpc:
+    registry:
+      #direct\etcd3\consul\zk .etc
+      protocol: "etcd3"
+      address: 127.0.0.1:2379
+#      protocol: "consul"
+#      address: 127.0.0.1:8500
+      #心跳频率，单位s
+      heartbeat_interval: 30
+    server:
+      name: "test"
+      desc: "test service"
+      version: "2.0.0"
+      register: True
+      macher: proto
+      address:
+        url: "127.0.0.1:9000"
+      #        - url: :9000
+      #        - url: tls://:9001
+      #        options:
+      #          #          register: true
+      #          tls_key: "test.key"
+      #          tls_cert: "test.cert"
+      #          - url: unix:///var/startup/test.sock
+      max_conn_size: 1000
+      max_pool_size: 1024
+      backlog: 1024
+      read_timeout: 10
+      write_timeout: 10
+
+    client:
+      test:
+        version: ">=1.0.0"
+        address:
+          url: "127.0.0.1:9000"
+        #          - url: "localhost:9000"
+        #          - url: "tls://localhost:9001"
+        #            options:
+        #              tls_key: "test.key"
+        #              tls_cert: "test.cert"
+        # 容错机制failover、failfast、failtry
+        fail: failfast
+        codec:
+          name: proto
+          options:
+            max_size: 2 m
+        #random\round-robin
+        balancer: random
+        #connect超时时间，单位秒
+        connect_timeout: 5
+        #读超时时间，单位秒
+        read_timeout: 10
+        #写超时时间，单位秒
+        write_timeout: 10
+  data:
+    sql:
+      test:
+        provider: mysql
+        host: localhost
+        port: 3306
+        database: test
+        user: root
+        password: '000000'
+        charset: utf8mb4
+#        address: user:password@tcp(127.0.0.1:3306)/test?parseTime=true
+        max_open_conns: 100
+        max_idle_conns: 1
+        conn_lifetime: 5m
+        trace:
+          enabled: True
+          # unit=ms
+          time: 200
+        options:
+          max_open_conns: 100
+          max_idle_conns: 1
+      exam:
+        provider: mysql
+        host: localhost
+        port: 3306
+        database: exam
+        user: root
+        password: '000000'
+        charset: utf8mb4
+        #        address: user:password@tcp(127.0.0.1:3306)/test?parseTime=true
+        max_open_conns: 100
+        max_idle_conns: 1
+        conn_lifetime: 5m
+        trace:
+          enabled: True
+          # unit=ms
+          time: 200
+        options:
+          max_open_conns: 100
+          max_idle_conns: 1
+
+    mongo:
+      theater:
+        uri: mongodb://theater:MongoTheater20181211@dds-2zeb54122a808e84-pub.mongodb.rds.aliyuncs.com:3717/theater
+        max_pool_size: 100
+        min_pool_size: 5
+        socket_time_out: 5000
+        connect_time_out: 5000
+        read_preference: Secondary
+
+    redis:
+      test_single:
+        type: single
+        address:
+          - 101.201.235.73:8379
+        master: m1
+        password: '123456'
+        max_pool_size: 100
+        socket_connect_timeout: 5000
+        socket_timeout: 5000
+      test_cluster:
+        type: cluster
+        address:
+          - 127.0.0.1:7001
+          - 127.0.0.1:7002
+          - 127.0.0.1:7003
+          - 127.0.0.1:7004
+          - 127.0.0.1:7005
+          - 127.0.0.1:7006
+        master: m1
+        password: ''
+        max_pool_size: 100
+        socket_connect_timeout: 5000
+        socket_timeout: 5000
+      test_sentinel:
+        type: sentinel
+        address:
+          - 127.0.0.1:26379
+          - 127.0.0.1:26380
+          - 127.0.0.1:26381
+          - 127.0.0.1:26382
+        master: mymaster
+        password: '123456'
+        max_pool_size: 100
+        socket_connect_timeout: 5000
+        socket_timeout: 5000
+
+    kafka:
+      consumer:
+        group-id: test-app
+        auto-offset-reset: earliest
+        key-deserializer:  org.apache.kafka.common.serialization.StringDeserializer
+      producer:
+        key-serializer: org.apache.kafka.common.serialization.StringSerializer
+        value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      bootstrap-servers: dev-bigdata01.awen-host.com:9092,dev-bigdata02.awen-host.com:9092,dev-bigdata03.awen-host.com:9092
+      listener:
+        concurrency: 3

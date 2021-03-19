@@ -1,0 +1,9 @@
+name: 'auxo'
+debug: false
+
+web:
+  authorize: '*'
+
+test:
+  id: 10
+  name: test
