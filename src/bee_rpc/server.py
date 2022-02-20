@@ -1,7 +1,7 @@
 from gevent import signal
 from gevent.server import StreamServer
-from gevent import monkey
-monkey.patch_all()
+import grpc._cython.cygrpc
+grpc._cython.cygrpc.init_grpc_gevent()
 
 from datetime import datetime
 from typing import List
@@ -234,7 +234,6 @@ class Server():
 
     def handle_signal(self):
         """register signal"""
-
         def handler(signum, frame):
             logging.info("bee.rpc > kill service={}, nid={}".format(self.opts.name, self.nid))
             self.registry.deregister(self.opts.name, self.nid)
@@ -259,9 +258,9 @@ class Server():
             spawn=self.opts.max_conn_size)
 
         self.register()
-
-        server.serve_forever()
         self.srv = server
+        print("Start success!")
+        server.serve_forever()
 
     def shutdown(self):
         """

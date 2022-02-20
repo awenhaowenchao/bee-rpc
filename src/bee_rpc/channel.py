@@ -1,6 +1,4 @@
 from gevent import socket
-from gevent import monkey
-monkey.patch_all()
 
 from bee_util.data.guid import Guid
 from bee_rpc.codec import Stream

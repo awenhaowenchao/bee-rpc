@@ -1,4 +1,3 @@
-
 from enum import Enum
 
 from bee_util.errors.error import CodedError
@@ -12,8 +11,6 @@ from gsocketpool import Pool
 from gsocketpool import TcpConnection
 
 import gevent
-from gevent import monkey
-monkey.patch_all()
 
 """default max connectinos"""
 default_max_connections = 100

@@ -2,6 +2,8 @@ from enum import Enum
 from typing import List
 
 from gevent.lock import BoundedSemaphore
+import grpc._cython.cygrpc
+grpc._cython.cygrpc.init_grpc_gevent()
 
 
 from bee_util.data.option import Options
@@ -127,7 +129,25 @@ class Client():
         self.registry.watch(self.opts.name, self.notify)
 
     def notify(self, event):
-        print("event=%s" % str(event))
+        action = event['action']
+        key = str(event['key'])
+        value = str(event['value'])
+        if action == "delete":
+            for i in self.nodes:
+
+                if key.find(i.id) != -1:
+                    self.nodes.remove(i)
+                    self._lb.nodes=self.nodes
+                    break
+        if action == "put":
+            _contains = False
+            for i in self.nodes:
+                if key.find(i.id) != -1:
+                    _contains = True
+            if not _contains:
+                node = Node(id=key[key.rfind("/")+1: ], address=value, cb=get_codec(self.opts.codec.name))
+                self.nodes.append(node)
+                self._lb.nodes = self.nodes
 
     @staticmethod
     def new_client(name: str = None, address: Address = Address(url="127.0.0.1:9000"),
